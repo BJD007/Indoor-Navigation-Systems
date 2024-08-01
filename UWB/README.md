@@ -24,11 +24,10 @@ This script provides a basic framework for indoor navigation using UWB PulseON m
 - Implement a more sophisticated trilateration or localization algorithm to improve position estimation accuracy.
 - Run the script on your mini-computer.
 
-Remember that this is a basic implementation and will need to be expanded and refined for a production system. You'll need to:
-- Implement error handling and robustness measures.
-- Integrate obstacle avoidance if necessary.
-- Implement a more sophisticated path planning algorithm.
-- Calibrate and fine-tune the system for your specific environment and hardware.
-- Also, ensure that your Pixhawk is configured correctly for indoor flight and that you have appropriate safety measures in place when testing the system.
+## Notes
+- Obstacle Avoidance: Implementing obstacle avoidance requires additional sensors (e.g., LiDAR, sonar) and algorithms (e.g., potential fields, vector field histograms).
+- Path Planning: Implementing path planning might involve algorithms like A*, D*, RRT, or other motion planning algorithms.
+- Calibration and Fine-Tuning: Ensure that the UWB system and Pixhawk are calibrated and fine-tuned for your specific environment and hardware.
+- Safety Measures: Always have appropriate safety measures in place when testing the system, especially for indoor flights.
 
 Created on 2015-10-01

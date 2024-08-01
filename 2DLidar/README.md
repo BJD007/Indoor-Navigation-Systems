@@ -40,7 +40,7 @@ On the mini computer, install the necessary software to communicate with the Pix
     - sudo usermod -a -G tty $USER
     - sudo usermod -a -G dialout $USER
 
-Write a script to communicate with the Pixhawk using the MAVLink protocol. Here's a basic Python example using pymavlink:
+Script to communicate with the Pixhawk using the MAVLink protocol. Here's a basic Python example using pymavlink:
 python
 from pymavlink import mavutil
 

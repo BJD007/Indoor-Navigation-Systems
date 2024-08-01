@@ -14,10 +14,18 @@ ANCHOR_POSITIONS = [
 ]
 
 # Connect to Pixhawk
-mavlink_connection = mavutil.mavlink_connection('/dev/ttyACM0', baud=115200)
+try:
+    mavlink_connection = mavutil.mavlink_connection('/dev/ttyACM0', baud=115200)
+except Exception as e:
+    print(f"Error connecting to Pixhawk: {e}")
+    exit(1)
 
 # Connect to UWB module
-uwb_serial = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+try:
+    uwb_serial = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+except Exception as e:
+    print(f"Error connecting to UWB module: {e}")
+    exit(1)
 
 def read_uwb_distances():
     """Read distances from UWB PulseON modules."""
@@ -27,7 +35,8 @@ def read_uwb_distances():
             line = uwb_serial.readline().decode('utf-8').strip()
             distance = float(line)
             distances.append(distance)
-        except (ValueError, serial.SerialException):
+        except (ValueError, serial.SerialException) as e:
+            print(f"Error reading UWB distance: {e}")
             distances.append(None)
     return distances
 
@@ -53,16 +62,31 @@ def trilaterate(distances):
 
 def send_position_target(x, y, z):
     """Send position target to Pixhawk."""
-    mavlink_connection.mav.set_position_target_local_ned_send(
-        0,  # time_boot_ms
-        mavlink_connection.target_system,
-        mavlink_connection.target_component,
-        mavutil.mavlink.MAV_FRAME_LOCAL_NED,
-        0b0000111111111000,  # type_mask (only positions enabled)
-        x, y, z,  # x, y, z positions
-        0, 0, 0,  # x, y, z velocity
-        0, 0, 0,  # x, y, z acceleration
-        0, 0)  # yaw, yaw_rate
+    try:
+        mavlink_connection.mav.set_position_target_local_ned_send(
+            0,  # time_boot_ms
+            mavlink_connection.target_system,
+            mavlink_connection.target_component,
+            mavutil.mavlink.MAV_FRAME_LOCAL_NED,
+            0b0000111111111000,  # type_mask (only positions enabled)
+            x, y, z,  # x, y, z positions
+            0, 0, 0,  # x, y, z velocity
+            0, 0, 0,  # x, y, z acceleration
+            0, 0)  # yaw, yaw_rate
+    except Exception as e:
+        print(f"Error sending position target: {e}")
+
+def obstacle_avoidance(x, y, z):
+    """Basic obstacle avoidance (placeholder)."""
+    # Implement obstacle avoidance logic here
+    # For now, just return the same coordinates
+    return x, y, z
+
+def path_planning(x, y, z):
+    """Basic path planning (placeholder)."""
+    # Implement path planning algorithm here
+    # For now, just return the same coordinates
+    return x, y, z
 
 def main():
     print("Starting indoor navigation system...")
@@ -79,6 +103,12 @@ def main():
             x, y, z = trilaterate(distances)
             print(f"Estimated position: ({x:.2f}, {y:.2f}, {z:.2f})")
 
+            # Apply obstacle avoidance
+            x, y, z = obstacle_avoidance(x, y, z)
+
+            # Apply path planning
+            x, y, z = path_planning(x, y, z)
+
             # Send position target to Pixhawk
             send_position_target(x, y, z)
 
@@ -89,6 +119,8 @@ def main():
 
     except KeyboardInterrupt:
         print("Stopping indoor navigation system...")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
     finally:
         uwb_serial.close()
 
